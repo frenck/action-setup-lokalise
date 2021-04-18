@@ -38,11 +38,11 @@ runs:
         echo "Installing the Lokalise CLI ${{ steps.version.outputs.version }}..."
 
         if [[ "${{ runner.os }}" == "Linux" ]]; then
-          base="lokalise2_linux_amd64"
+          base="lokalise2_linux_x86_64"
         elif [[ "${{ runner.os }}" == "Windows" ]]; then
-          base="lokalise2_windows_386"
+          base="lokalise2_windows_i386"
         elif [[ "${{ runner.os }}" == "macOS" ]]; then
-          base="lokalise2_darwin_amd64"
+          base="lokalise2_darwin_x86_64"
         fi
 
         download="${base}.tar.gz"
@@ -51,10 +51,6 @@ runs:
         fi
 
         dest="${RUNNER_TEMP}/lokalise/lokalise2/"
-        executable="${dest}lokalise2"
-        if [[ "${{ runner.os }}" == "Windows" ]]; then
-          executable="${executable}.exe"
-        fi
 
         mkdir -p "${dest}"
         curl \
@@ -69,7 +65,7 @@ runs:
         fi
 
         if [[ "${{ runner.os }}" != "Windows" ]]; then
-          chmod +x "${executable}"
+          chmod +x "${dest}lokalise2"
         fi
 
         echo "${dest}" >> $GITHUB_PATH
