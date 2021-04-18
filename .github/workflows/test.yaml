@@ -1,0 +1,20 @@
+---
+name: Test
+
+# yamllint disable-line rule:truthy
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test Lokalise CLI on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      matrix:
+        os: [ubuntu, windows, macos]
+    steps:
+      - name: ⤵️ Check out code from GitHub
+        uses: actions/checkout@v2
+      - name: 🏗 Set up the Lokalise CLI
+        uses: ./
+      - name: 🚀 Run lokalise
+        run: lokalise2 --version

@@ -1,0 +1,75 @@
+---
+name: "Frenck's Lokalise CLI setup"
+description: 🚀 Frenck's GitHub Action for setting up the Lokalise CLI.
+author: frenck
+
+branding:
+  color: red
+  icon: thumbs-up
+
+inputs:
+  version:
+    required: false
+    description: The version of the Lokalise CLI to install
+    default: latest
+outputs:
+  version:
+    description: The version of the Lokalise CLI that was installed
+    value: ${{ steps.version.outputs.version }}
+
+runs:
+  using: composite
+  steps:
+    - id: version
+      shell: bash
+      run: |
+        version="v$( echo '${{ inputs.version }}' | sed s/^v//)"
+        if [[ "${{ inputs.version }}" == "latest" ]]; then
+          version=$(curl -s https://api.github.com/repos/lokalise/lokalise-cli-2-go/releases/latest | jq -r '.tag_name')
+        fi
+
+        if [[ "$version" == "null" ]]; then
+          exit 1;
+        fi
+
+        echo "::set-output name=version::${version}"
+    - shell: bash
+      run: |
+        echo "Installing the Lokalise CLI ${{ steps.version.outputs.version }}..."
+
+        if [[ "${{ runner.os }}" == "Linux" ]]; then
+          base="lokalise2_linux_amd64"
+        elif [[ "${{ runner.os }}" == "Windows" ]]; then
+          base="lokalise2_windows_386"
+        elif [[ "${{ runner.os }}" == "macOS" ]]; then
+          base="lokalise2_darwin_amd64"
+        fi
+
+        download="${base}.tar.gz"
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          download="${base}.zip"
+        fi
+
+        dest="${RUNNER_TEMP}/lokalise/lokalise2/"
+        executable="${dest}lokalise2"
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          executable="${executable}.exe"
+        fi
+
+        mkdir -p "${dest}"
+        curl \
+          -L \
+          "https://github.com/lokalise/lokalise-cli-2-go/releases/download/${{ steps.version.outputs.version }}/${download}" \
+          --output "${dest}${download}"
+
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          7z e "${dest}${download}" "-o${dest}"
+        else
+          tar -zxvf "${dest}${download}" -C "${dest}"
+        fi
+
+        if [[ "${{ runner.os }}" != "Windows" ]]; then
+          chmod +x "${executable}"
+        fi
+
+        echo "${dest}" >> $GITHUB_PATH
