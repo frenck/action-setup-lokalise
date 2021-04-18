@@ -30,7 +30,7 @@ jobs:
       - name: 🏗 Set up the Lokalise CLI
         uses: frenck/action-setup-lokalise@v1
       - name: 🚀 Use Lokalise
-        run: lokalise --version
+        run: lokalise2 --version
 ```
 
 ## Arguments
