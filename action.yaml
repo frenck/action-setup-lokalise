@@ -20,19 +20,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - id: version
-      shell: bash
-      run: |
-        version="v$( echo '${{ inputs.version }}' | sed s/^v//)"
-        if [[ "${{ inputs.version }}" == "latest" ]]; then
-          version=$(curl -s https://api.github.com/repos/lokalise/lokalise-cli-2-go/releases/latest | jq -r '.tag_name')
-        fi
-
-        if [[ "$version" == "null" ]]; then
-          exit 1;
-        fi
-
-        echo "version=${version}" >> "$GITHUB_OUTPUT"
     - shell: bash
       run: |
         echo "Installing the Lokalise CLI ${{ steps.version.outputs.version }}..."
@@ -55,7 +42,7 @@ runs:
         mkdir -p "${dest}"
         curl \
           -L \
-          "https://github.com/lokalise/lokalise-cli-2-go/releases/download/${{ steps.version.outputs.version }}/${download}" \
+          "https://github.com/lokalise/lokalise-cli-2-go/releases/${{ steps.version.outputs.version }}/download/${download}"
           --output "${dest}${download}"
 
         if [[ "${{ runner.os }}" == "Windows" ]]; then
@@ -69,3 +56,9 @@ runs:
         fi
 
         echo "${dest}" >> $GITHUB_PATH
+
+    - id: version
+      shell: bash
+      run: |
+        rawversion=$(lokalise2 --version)
+        echo "version=${rawversion##* }" >> "$GITHUB_OUTPUT"
