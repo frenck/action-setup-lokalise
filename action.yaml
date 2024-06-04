@@ -22,7 +22,13 @@ runs:
   steps:
     - shell: bash
       run: |
-        echo "Installing the Lokalise CLI ${{ steps.version.outputs.version }}..."
+        if [[ "${{ inputs.version }}" == "latest" ]]; then
+          version="latest"
+        else
+          version="v$( echo '${{ inputs.version }}' | sed s/^v//)"
+        fi
+
+        echo "Installing the Lokalise CLI ${version}..."
 
         if [[ "${{ runner.os }}" == "Linux" ]]; then
           base="lokalise2_linux_x86_64"
@@ -42,7 +48,7 @@ runs:
         mkdir -p "${dest}"
         curl \
           -L \
-          "https://github.com/lokalise/lokalise-cli-2-go/releases/${{ steps.version.outputs.version }}/download/${download}"
+          "https://github.com/lokalise/lokalise-cli-2-go/releases/${ version }/download/${download}"
           --output "${dest}${download}"
 
         if [[ "${{ runner.os }}" == "Windows" ]]; then
