@@ -34,4 +34,4 @@ jobs:
       - name: ⤵️ Check out code from GitHub
         uses: actions/checkout@v6.0.2
       - name: 🚀 Run YAMLLint
-        uses: frenck/action-yamllint@v1.5
+        uses: frenck/action-yamllint@v1.5.0
